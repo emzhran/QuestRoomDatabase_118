@@ -27,16 +27,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mvvmdatabase.data.entity.Mahasiswa
+import com.example.mvvmdatabase.ui.viewmodel.DetailUiState
+import com.example.mvvmdatabase.ui.viewmodel.toMahasiswaEntity
 import com.example.mvvmdatabase.ui.customwidget.TopAppBar
 import com.example.mvvmdatabase.ui.viewmodel.DetailMhsViewModel
-import com.example.mvvmdatabase.ui.viewmodel.DetailUiState
 import com.example.mvvmdatabase.ui.viewmodel.PenyediaViewModel
-import com.example.mvvmdatabase.ui.viewmodel.toMahasiswaEntity
 
 @Composable
 fun DetailMhsView(
@@ -46,7 +47,7 @@ fun DetailMhsView(
     onEditClick: (String) -> Unit = { },
     onDeleteClick: () -> Unit = { }
 ){
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
                 onBack = onBack,
@@ -57,8 +58,7 @@ fun DetailMhsView(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    onEditClick(viewModel.detailUiState.value.detailUiEvent.nim)
-                },
+                    onEditClick(viewModel.detailUiState.value.detailUiEvent.nim) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(16.dp)
             ) {
@@ -68,39 +68,42 @@ fun DetailMhsView(
                 )
             }
         }
-    ){innerpadding->
+    ) { innerPadding ->
         val detailUiState by viewModel.detailUiState.collectAsState()
+
         BodyDetailMhs(
-            modifier = Modifier.padding(innerpadding),
+            modifier = Modifier.padding(innerPadding),
             detailUiState = detailUiState,
-            onDeleteClick ={
+            onDeleteClick = {
                 viewModel.deleteMhs()
                 onDeleteClick()
             }
         )
+
     }
 }
-
 
 @Composable
 fun BodyDetailMhs(
     modifier: Modifier = Modifier,
     detailUiState: DetailUiState = DetailUiState(),
-    onDeleteClick: ()-> Unit = { }
+    onDeleteClick: () -> Unit = { }
 ){
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
+
     when{
-        detailUiState.isLoading ->{
+        detailUiState.isLoading -> {
             Box(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
-            ){
-                CircularProgressIndicator()
+            ) {
+                CircularProgressIndicator() // Tampilkan Loading
             }
         }
-        detailUiState.isUiEventNotEmpty ->{
+
+        detailUiState.isUiEventNotEmpty -> {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
@@ -117,23 +120,25 @@ fun BodyDetailMhs(
                 ) {
                     Text(text = "Delete")
                 }
-                if (deleteConfirmationRequired){
+
+                if (deleteConfirmationRequired) {
                     DeleteConfirmationDialog(
                         onDeleteConfirm = {
                             deleteConfirmationRequired = false
                             onDeleteClick()
                         },
-                        onDeleteCancel = {deleteConfirmationRequired = false},
+                        onDeleteCancel = { deleteConfirmationRequired = false },
                         modifier = Modifier.padding(8.dp)
                     )
                 }
             }
         }
-        detailUiState.isUiEventNotEmpty ->{
+
+        detailUiState.isUiEventEmpty -> {
             Box(
                 modifier = modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Text(
                     text = "Data tidak ditemukan",
                     modifier = Modifier.padding(16.dp)
@@ -156,7 +161,7 @@ fun ItemDetailMhs(
         )
     ) {
         Column(
-            modifier = modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             ComponentDetailMhs(judul = "NIM", isinya = mahasiswa.nim)
             Spacer(modifier = Modifier.padding(4.dp))
@@ -174,17 +179,15 @@ fun ItemDetailMhs(
             Spacer(modifier = Modifier.padding(4.dp))
 
             ComponentDetailMhs(judul = "Angkatan", isinya = mahasiswa.angkatan)
-            Spacer(modifier = Modifier.padding(4.dp))
         }
     }
 }
 
-
 @Composable
 fun ComponentDetailMhs(
     modifier: Modifier = Modifier,
-    judul : String,
-    isinya : String,
+    judul: String,
+    isinya: String,
 ){
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -193,6 +196,13 @@ fun ComponentDetailMhs(
         Text(
             text = "$judul : ",
             fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Gray
+        )
+
+        Text(
+            text = isinya,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
     }
@@ -200,9 +210,11 @@ fun ComponentDetailMhs(
 
 @Composable
 private fun DeleteConfirmationDialog(
-    onDeleteConfirm: ()-> Unit, onDeleteCancel: () -> Unit, modifier: Modifier = Modifier
+    onDeleteConfirm: () -> Unit,
+    onDeleteCancel: () -> Unit,
+    modifier: Modifier = Modifier
 ){
-    AlertDialog(onDismissRequest = { },
+    AlertDialog(onDismissRequest = { /* Do Nothing */},
         title = { Text("Delete Data") },
         text = { Text("Apakah anda yakin ingin menghapus data?") },
         modifier = modifier,
@@ -212,7 +224,7 @@ private fun DeleteConfirmationDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDeleteCancel) {
+            TextButton(onClick = onDeleteConfirm) {
                 Text(text = "Yes")
             }
         })

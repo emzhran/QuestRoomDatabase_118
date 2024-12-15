@@ -1,5 +1,6 @@
 package com.example.mvvmdatabase.ui.view.mahasiswa
 
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,16 +38,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mvvmdatabase.data.entity.Mahasiswa
 import com.example.mvvmdatabase.ui.customwidget.TopAppBar
-import com.example.mvvmdatabase.ui.viewmodel.HomeMhsViewModel
 import com.example.mvvmdatabase.ui.viewmodel.HomeUiState
+import com.example.mvvmdatabase.ui.viewmodel.HomeMhsViewModel
 import com.example.mvvmdatabase.ui.viewmodel.PenyediaViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeMhsView(
     viewModel: HomeMhsViewModel = viewModel(factory = PenyediaViewModel.Factory),
-    onAddMhs : ()-> Unit = { },
-    onDetailClick : (String) -> Unit = { },
+    onAddMhs: () -> Unit = { },
+    onDetailClick: (String) -> Unit = { },
     modifier: Modifier = Modifier
 ){
     Scaffold(
@@ -54,7 +55,7 @@ fun HomeMhsView(
             TopAppBar(
                 onBack = { },
                 showBackButton = false,
-                judul = "Tambah Mahasiswa"
+                judul = "Daftar Mahasiswa"
             )
         },
         floatingActionButton = {
@@ -62,15 +63,15 @@ fun HomeMhsView(
                 onClick = onAddMhs,
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(16.dp)
-            ){
+            ) {
                 Icon(
-                    imageVector = Icons.Filled.Add,
+                    imageVector = Icons.Default.Add,
                     contentDescription = "Tambah Mahasiswa",
                 )
             }
         }
-    ){
-        innerPadding->
+    ) {
+            innerPadding ->
         val homeUiState by viewModel.HomeUiState.collectAsState()
 
         BodyHomeMhsView(
@@ -81,8 +82,9 @@ fun HomeMhsView(
             modifier = Modifier.padding(innerPadding)
         )
     }
-}
 
+
+}
 
 @Composable
 fun BodyHomeMhsView(
@@ -91,30 +93,32 @@ fun BodyHomeMhsView(
     modifier: Modifier = Modifier
 ){
     val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() } // Snackbar state
     when {
-        homeUiState.isLoading ->{
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center)
-            {
-                CircularProgressIndicator()
-            }
-        }
-        homeUiState.isError ->{
-            LaunchedEffect(homeUiState.errorMessage) {
-                homeUiState.errorMessage?.let{message->
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(message)
-                    }
-                }
-            }
-        }
-        homeUiState.listMhs.isEmpty()->{
+        homeUiState.isLoading -> {
             Box(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ){
+                CircularProgressIndicator()
+            }
+        }
+
+        homeUiState.isError -> {
+            LaunchedEffect(homeUiState.errorMessage) {
+                homeUiState.errorMessage?.let { message ->
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(message)  // Tampilkan Snackbar
+                    }
+                }
+            }
+        }
+
+        homeUiState.listMhs.isEmpty() -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = "Tidak ada data mahasiswa.",
                     fontSize = 18.sp,
@@ -123,18 +127,21 @@ fun BodyHomeMhsView(
                 )
             }
         }
-        else ->{
+
+        else -> {
             ListMahasiswa(
                 listMhs = homeUiState.listMhs,
                 onClick = {
                     onClick(it)
-                    println(it)
-                }, modifier = modifier
+                    println(
+                        it
+                    )
+                },
+                modifier = modifier
             )
         }
     }
 }
-
 
 @Composable
 fun ListMahasiswa(
@@ -142,35 +149,37 @@ fun ListMahasiswa(
     modifier: Modifier = Modifier,
     onClick: (String) -> Unit = { }
 ){
-    LazyColumn(modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier
+    ) {
         items(
             items = listMhs,
-            itemContent = {mhs ->
+            itemContent = { mhs ->
                 CardMhs(
                     mhs = mhs,
-                    onClick = {onClick(mhs.nim)}
+                    onClick = { onClick(mhs.nim) }
                 )
             }
         )
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardMhs(
     mhs: Mahasiswa,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
-){
+    onClick: () -> Unit = { }
+) {
     Card(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-    ) {
-        Column(modifier = Modifier.padding(8.dp))
-        {
+    ){
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -184,7 +193,7 @@ fun CardMhs(
                 )
             }
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(imageVector = Icons.Filled.DateRange, contentDescription = "")
@@ -203,7 +212,7 @@ fun CardMhs(
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
                     text = mhs.kelas,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }

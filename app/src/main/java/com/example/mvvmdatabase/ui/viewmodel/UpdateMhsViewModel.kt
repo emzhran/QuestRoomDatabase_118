@@ -7,17 +7,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mvvmdatabase.data.entity.Mahasiswa
-import com.example.mvvmdatabase.repositroy.LocalRepositoryMhs
 import com.example.mvvmdatabase.repositroy.RepositoryMhs
 import com.example.mvvmdatabase.ui.navigation.AlamatNavigasi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class UpdateMhsViewModel(
+class UpdateMhsViewModel (
     savedStateHandle: SavedStateHandle,
     private val repositoryMhs: RepositoryMhs
-): ViewModel(){
+) : ViewModel() {
+
     var updateUIState by mutableStateOf(MhsUIState())
         private set
 
@@ -32,30 +32,31 @@ class UpdateMhsViewModel(
         }
     }
 
-    fun updateState(mahasiswaEvent: MahasiswaEvent){
+    fun updateState (mahasiswaEvent: MahasiswaEvent) {
         updateUIState = updateUIState.copy(
             mahasiswaEvent = mahasiswaEvent,
         )
     }
 
-    fun validateFields():Boolean{
+    fun validateFields(): Boolean {
         val event = updateUIState.mahasiswaEvent
         val errorState = FormErrorState(
-            nim = if (event.nim.isNotEmpty())null else "NIM tidak boleh kosong",
-            nama = if (event.nama.isNotEmpty())null else "Nama tidak boleh kosong",
-            jenisKelamin = if (event.jenisKelamin.isNotEmpty())null else "Jenis Kelamin tidak boleh kosong",
-            alamat = if (event.alamat.isNotEmpty())null else "Alamat tidak boleh kosong",
-            kelas = if (event.kelas.isNotEmpty())null else "Kelas tidak boleh kosong",
-            angkatan = if (event.angkatan.isNotEmpty())null else "Angkatan tidak boleh kosong",
+            nim = if (event.nim.isNotEmpty()) null else "NIM tidak boleh kosong",
+            nama = if (event.nama.isNotEmpty()) null else "Nama tidak boleh kosong",
+            jenisKelamin = if (event.jenisKelamin.isNotEmpty()) null else "Jenis Kelamin tidak boleh kosong",
+            alamat = if (event.alamat.isNotEmpty()) null else "Alamat tidak boleh kosong",
+            kelas = if (event.kelas.isNotEmpty()) null else "Kelas tidak boleh kosong",
+            angkatan = if (event.angkatan.isNotEmpty()) null else "Angkatan tidak boleh kosong"
         )
+
         updateUIState = updateUIState.copy(isEntryValid = errorState)
         return errorState.isValid()
     }
 
-    fun updateData(){
+    fun updateData() {
         val currentEvent = updateUIState.mahasiswaEvent
 
-        if (validateFields()){
+        if (validateFields()) {
             viewModelScope.launch {
                 try {
                     repositoryMhs.updateMhs(currentEvent.toMahasiswaEntity())
@@ -65,22 +66,22 @@ class UpdateMhsViewModel(
                         isEntryValid = FormErrorState()
                     )
                     println("snackBarMessage diatur: ${updateUIState.snackbarMessage}")
-                } catch (e: Exception){
+                } catch (e: Exception) {
                     updateUIState = updateUIState.copy(
                         snackbarMessage = "Data gagal diupdate"
                     )
                 }
             }
-        } else{
+        } else {
             updateUIState = updateUIState.copy(
                 snackbarMessage = "Data gagal diupdate"
             )
         }
     }
-
-    fun resetSnacBarMessage(){
+    fun resetSnackBarMessage() {
         updateUIState = updateUIState.copy(snackbarMessage = null)
     }
+
 }
 
 fun Mahasiswa.toUIStateMhs(): MhsUIState = MhsUIState(

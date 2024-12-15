@@ -27,11 +27,13 @@ fun UpdateMhsView(
     onBack: () -> Unit,
     onNavigate: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: UpdateMhsViewModel = viewModel(factory = PenyediaViewModel.Factory)
+    viewModel: UpdateMhsViewModel = viewModel(factory = PenyediaViewModel.Factory) // Inisialisasi ViewModel
 ){
-    val uiState = viewModel.updateUIState
-    val snackbarHostState = remember { SnackbarHostState() }
+    val uiState = viewModel.updateUIState // Ambil UI state dari ViewModel
+    val snackbarHostState = remember { SnackbarHostState() } // Snackbar state
     val coroutineScope = rememberCoroutineScope()
+
+    // Observasi perubahan snackbarMessage
     LaunchedEffect(uiState.snackbarMessage) {
         println("LaunchedEffect triggered")
         uiState.snackbarMessage?.let { message ->
@@ -42,46 +44,49 @@ fun UpdateMhsView(
                     message = message,
                     duration = SnackbarDuration.Long
                 )
-                viewModel.resetSnacBarMessage()
+                viewModel.resetSnackBarMessage()
             }
         }
     }
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, // Tempatkan Snackbar di Scaffold
         topBar = {
             TopAppBar(
-                judul = "Edit Mahasiswa",
-                showBackButton = true,
                 onBack = onBack,
+                showBackButton = true,
+                judul = "Edit Mahasiswa",
             )
         }
-    ){
-        padding ->
+    ) { padding ->
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
         ) {
+
+            // Isi Body
             InsertBodyMhs(
                 uiState = uiState,
-                onValueChange = {updateEvent->
-                    viewModel.updateState(updateEvent)
+                onValueChange = { updatedEvent ->
+                    viewModel.updateState(updatedEvent) // Update state di ViewModel
                 },
                 onClick = {
                     coroutineScope.launch {
-                        if (viewModel.validateFields()){
+                        if (viewModel.validateFields()) {
                             viewModel.updateData()
                             delay(600)
-                            withContext(Dispatchers.Main){
-                                onNavigate()
+                            withContext(Dispatchers.Main) {
+                                onNavigate() // Navigasi di main thread
                             }
                         }
                     }
                 }
             )
+
         }
+
     }
 }
