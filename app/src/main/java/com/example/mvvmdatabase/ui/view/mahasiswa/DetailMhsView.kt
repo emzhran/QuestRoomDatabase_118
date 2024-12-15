@@ -1,6 +1,5 @@
 package com.example.mvvmdatabase.ui.view.mahasiswa
 
-import android.widget.Space
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,19 +27,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Delete
 import com.example.mvvmdatabase.data.entity.Mahasiswa
 import com.example.mvvmdatabase.ui.customwidget.TopAppBar
 import com.example.mvvmdatabase.ui.viewmodel.DetailMhsViewModel
 import com.example.mvvmdatabase.ui.viewmodel.DetailUiState
 import com.example.mvvmdatabase.ui.viewmodel.PenyediaViewModel
 import com.example.mvvmdatabase.ui.viewmodel.toMahasiswaEntity
-import org.jetbrains.annotations.Contract
 
 @Composable
 fun DetailMhsView(
@@ -53,10 +49,9 @@ fun DetailMhsView(
     Scaffold (
         topBar = {
             TopAppBar(
-                judul = "Detail Mahasiswa",
-                showBackButton = true,
                 onBack = onBack,
-                modifier = modifier
+                showBackButton = true,
+                judul = "Detail Mahasiswa"
             )
         },
         floatingActionButton = {
